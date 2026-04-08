@@ -5,7 +5,8 @@
 This project is a small email triage environment with three sample tasks. It includes:
 
 - `inference.py` for evaluator-facing submission runs
-- `app.py` for a local Gradio demo
+- `app.py` for the OpenEnv-compatible API server used in deployment
+- `demo_app.py` for a local Gradio demo
 - simple reporting artifacts for local inspection
 
 ## Features
@@ -14,7 +15,8 @@ This project is a small email triage environment with three sample tasks. It inc
 - Three sample tasks with increasing difficulty
 - Partial reward grading
 - OpenAI-compatible submission path in `inference.py`
-- Interactive Gradio UI
+- OpenEnv-compatible API server for validator checks
+- Interactive Gradio UI for local demo use
 - Decision reason and confidence output
 - Logging for every evaluation run
 - Performance chart generation
@@ -86,6 +88,20 @@ The script prints only the required structured logs:
 pip install -r requirements.txt
 ```
 
+Run the API server used for deployment and automated checks:
+
+```bash
+uvicorn app:app --host 0.0.0.0 --port 7860
+```
+
+The OpenEnv API supports:
+
+- `POST /reset?difficulty=easy|medium|hard`
+- `POST /reset` with a JSON body like `{"task_id": 1}`
+- `POST /step` with the `Action` payload
+- `GET /state`
+- `GET /health`
+
 Set environment variables for the evaluator path:
 
 ```bash
@@ -98,14 +114,14 @@ python inference.py
 For the Gradio demo, run:
 
 ```bash
-python app.py
+python demo_app.py
 ```
 
 Then open `http://127.0.0.1:7860`.
 
 ## Deploy
 
-You can run this locally or upload it to Hugging Face Spaces with the Docker SDK.
+You can run this locally or upload it to Hugging Face Spaces with the Docker SDK. The container now starts the OpenEnv API server by default so automated reset/step checks receive JSON responses instead of the Gradio HTML shell.
 
 ## Evaluation
 
@@ -131,7 +147,8 @@ Each app run can produce:
 - Only `API_BASE_URL` and `MODEL_NAME` have defaults
 - `HF_TOKEN` is optional
 - Structured stdout follows `[START]`, `[STEP]`, `[END]`
-- `app.py` remains a separate local demo entrypoint
+- deployed `app.py` serves JSON OpenEnv endpoints
+- `demo_app.py` remains available for local Gradio testing
 
 ## How To Deploy
 

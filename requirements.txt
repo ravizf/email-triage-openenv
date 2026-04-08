@@ -3,3 +3,5 @@ gradio
 matplotlib
 reportlab
 openai
+fastapi
+uvicorn
