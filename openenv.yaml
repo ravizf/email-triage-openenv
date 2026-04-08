@@ -1,0 +1,9 @@
+name: email-triage-advanced
+description: Advanced real-world email triage environment
+tasks:
+  - id: 0
+    difficulty: easy
+  - id: 1
+    difficulty: medium
+  - id: 2
+    difficulty: hard
