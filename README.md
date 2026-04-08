@@ -2,14 +2,18 @@
 
 ## Overview
 
-This project is a small email triage environment with three sample tasks. It classifies each email, explains the decision, and saves simple evaluation artifacts.
+This project is a small email triage environment with three sample tasks. It includes:
+
+- `inference.py` for evaluator-facing submission runs
+- `app.py` for a local Gradio demo
+- simple reporting artifacts for local inspection
 
 ## Features
 
 - OpenEnv-style interface (`step`, `reset`, `state`)
 - Three sample tasks with increasing difficulty
 - Partial reward grading
-- Offline rule-based agent
+- OpenAI-compatible submission path in `inference.py`
 - Interactive Gradio UI
 - Decision reason and confidence output
 - Logging for every evaluation run
@@ -61,19 +65,39 @@ Each action is a structured object with:
 - `reason`: short explanation for the chosen action
 - `confidence`: heuristic confidence score between `0.0` and `1.0`
 
-## Agent
+## Submission Inference
 
-The current agent uses a small deterministic policy to:
+`inference.py` is the source of truth for submission. It uses the OpenAI Python client and reads these variables:
 
-- Detect urgent incidents, meetings, and spam
-- Decide the correct action without external APIs
-- Generate a short response when needed
-- Explain its decision with a reason and confidence score
+- `API_BASE_URL`
+- `MODEL_NAME`
+- `HF_TOKEN` as an optional token
+- `LOCAL_IMAGE_NAME` only if you use `from_docker_image()`
+
+The script prints only the required structured logs:
+
+- `[START]`
+- `[STEP]`
+- `[END]`
 
 ## Run Locally
 
 ```bash
 pip install -r requirements.txt
+```
+
+Set environment variables for the evaluator path:
+
+```bash
+export API_BASE_URL="https://your-openai-compatible-endpoint/v1"
+export MODEL_NAME="your-model-name"
+export HF_TOKEN="your-token-if-needed"
+python inference.py
+```
+
+For the Gradio demo, run:
+
+```bash
 python app.py
 ```
 
@@ -103,13 +127,11 @@ Each app run can produce:
 
 ## Checklist
 
-- App runs without errors
-- Gradio UI opens correctly
-- Scores are generated
-- `performance.png` is created
-- `report.pdf` is created
-- Docker container runs correctly
-- README is clean and current
+- `inference.py` uses the OpenAI client configured through env vars
+- Only `API_BASE_URL` and `MODEL_NAME` have defaults
+- `HF_TOKEN` is optional
+- Structured stdout follows `[START]`, `[STEP]`, `[END]`
+- `app.py` remains a separate local demo entrypoint
 
 ## How To Deploy
 
