@@ -2,6 +2,7 @@ from typing import Any, Dict, Optional
 
 from fastapi import Body, FastAPI, HTTPException, Query
 from pydantic import BaseModel
+import uvicorn
 
 from email_triage_openenv.env import EmailTriageEnv
 from email_triage_openenv.models import Action
@@ -116,3 +117,7 @@ def state() -> Dict[str, Any]:
     current_task_id = current_state.get("id") if isinstance(current_state, dict) else None
     metadata = task_metadata(current_task_id) if current_task_id in DIFFICULTY_TO_TASK_ID.values() else None
     return {"initialized": True, "state": current_state, "task": metadata}
+
+
+def main() -> None:
+    uvicorn.run(app, host="0.0.0.0", port=7860)
