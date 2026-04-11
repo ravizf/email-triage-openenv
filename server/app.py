@@ -1,5 +1,5 @@
 def main():
-    print("OpenEnv server is running")
+    return "OK"
 
 
 if __name__ == "__main__":
