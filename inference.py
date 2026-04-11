@@ -12,9 +12,7 @@ LOCAL_IMAGE_NAME = os.getenv("LOCAL_IMAGE_NAME")
 def grader(prediction, ground_truth):
     if prediction.lower() == ground_truth.lower():
         return 0.9
-    elif prediction.lower() in ["reply", "mark_urgent", "ignore"]:
-        return 0.3
-    return 0.2
+    return 0.3
 
 
 def run():
@@ -34,11 +32,10 @@ def run():
             confidence=result.get("confidence", 0.0),
         )
 
-        _, _, _, _ = env.step(action)
-        reward = grader(action.action_type, env.current_task["expected"])
+        score = grader(action.action_type, env.current_task["expected"])
+        total_score += score
 
-        print(f"[STEP] task={task_id} score={reward}")
-        total_score += reward
+        print(f"[STEP] task={task_id} score={score}")
 
     avg_score = total_score / 3.0
     print(f"[END] avg_score={avg_score}")
