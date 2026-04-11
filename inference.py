@@ -12,7 +12,9 @@ LOCAL_IMAGE_NAME = os.getenv("LOCAL_IMAGE_NAME")
 def grader(prediction, ground_truth):
     if prediction.lower() == ground_truth.lower():
         return 0.9
-    return 0.3
+    elif prediction.lower() in ["reply", "mark_urgent", "ignore"]:
+        return 0.3
+    return 0.2
 
 
 def run():
