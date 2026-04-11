@@ -1,4 +1,5 @@
-from app import main
+def main():
+    print("OpenEnv server is running")
 
 
 if __name__ == "__main__":
