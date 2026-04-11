@@ -9,18 +9,11 @@ description = "Email triage OpenEnv project"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "openenv-core>=0.2.0",
     "pydantic",
-    "gradio",
-    "matplotlib",
-    "reportlab",
-    "openai",
-    "fastapi",
-    "uvicorn",
 ]
 
 [project.scripts]
-server = "app:main"
+email-triage-openenv = "app:main"
 
 [tool.setuptools]
 packages = ["email_triage_openenv"]

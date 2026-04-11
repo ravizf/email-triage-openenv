@@ -1,30 +1,29 @@
-def keyword_score(text, keywords):
-    text = text.lower()
-    matches = sum(1 for k in keywords if k in text)
-    return matches / len(keywords)
-
-
-def grade(task, action, step):
+def grade(task, action):
     expected = task["expected"]
+    predicted = action.action_type
 
-    # Base score
-    score = 0.0
+    if predicted == expected:
+        return 0.9
 
-    # Correct action
-    if action.action_type == expected:
-        score += 0.6
+    if expected == "mark_urgent":
+        if predicted == "reply":
+            return 0.6
+        if predicted == "ignore":
+            return 0.2
+        return 0.1
 
-    # Keyword understanding
-    email_text = task["email"].subject + " " + task["email"].body
-    score += 0.3 * keyword_score(email_text, task["keywords"])
+    if expected == "reply":
+        if predicted == "mark_urgent":
+            return 0.5
+        if predicted == "ignore":
+            return 0.2
+        return 0.1
 
-    # Response quality (for reply tasks)
-    if expected == "reply" and action.response:
-        if len(action.response.split()) > 3:
-            score += 0.1
+    if expected == "ignore":
+        if predicted == "reply":
+            return 0.4
+        if predicted == "mark_urgent":
+            return 0.3
+        return 0.1
 
-    # Penalty for wrong urgent handling
-    if expected == "mark_urgent" and action.action_type != "mark_urgent":
-        score -= 0.2
-
-    return max(0.0, min(score, 1.0))
+    return 0.1

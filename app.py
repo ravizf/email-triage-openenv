@@ -1,123 +1,166 @@
-from typing import Any, Dict, Optional
-
-from fastapi import Body, FastAPI, HTTPException, Query
-from pydantic import BaseModel
-import uvicorn
+from html import escape
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from urllib.parse import parse_qs
 
 from email_triage_openenv.env import EmailTriageEnv
 from email_triage_openenv.models import Action
+from llm_agent import llm_decide
 
 
-app = FastAPI(title="Email Triage OpenEnv API")
 env = EmailTriageEnv()
-DIFFICULTY_TO_TASK_ID = {"easy": 0, "medium": 1, "hard": 2}
 
 
-class ResetRequest(BaseModel):
-    task_id: int = 0
-
-
-class StepResponse(BaseModel):
-    observation: Dict[str, Any]
-    reward: float
-    done: bool
-    info: Dict[str, Any]
-
-
-def model_to_dict(value: Any) -> Any:
-    if hasattr(value, "model_dump"):
-        return value.model_dump()
-    return value
-
-
-def normalize_task_selection(
-    task_id: Optional[int],
-    difficulty: Optional[str],
-    body: Optional[ResetRequest],
-) -> int:
-    if task_id is not None:
-        selected_task_id = task_id
-    elif body is not None and body.task_id is not None:
-        selected_task_id = body.task_id
-    elif difficulty is not None:
-        normalized_difficulty = difficulty.strip().lower()
-        if normalized_difficulty not in DIFFICULTY_TO_TASK_ID:
-            raise HTTPException(status_code=400, detail="Invalid difficulty")
-        selected_task_id = DIFFICULTY_TO_TASK_ID[normalized_difficulty]
-    else:
-        selected_task_id = 0
-
-    if selected_task_id not in DIFFICULTY_TO_TASK_ID.values():
-        raise HTTPException(status_code=400, detail="Invalid task_id")
-
-    return selected_task_id
-
-
-def task_metadata(task_id: int) -> Dict[str, Any]:
-    difficulty = next(
-        name for name, mapped_task_id in DIFFICULTY_TO_TASK_ID.items() if mapped_task_id == task_id
-    )
-    return {"task_id": task_id, "difficulty": difficulty}
-
-
-@app.get("/")
-def root() -> Dict[str, Any]:
-    return {
-        "status": "ok",
-        "message": "Email Triage OpenEnv API",
-        "endpoints": ["/reset", "/step", "/state", "/health"],
-        "supported_difficulties": list(DIFFICULTY_TO_TASK_ID.keys()),
-    }
-
-
-@app.get("/health")
-def health() -> Dict[str, Any]:
-    return {"status": "ok", "initialized": env.task is not None}
-
-
-@app.post("/reset")
-def reset(
-    payload: Optional[ResetRequest] = Body(default=None),
-    task_id: Optional[int] = Query(default=None),
-    difficulty: Optional[str] = Query(default=None),
-) -> Dict[str, Any]:
-    selected_task_id = normalize_task_selection(task_id, difficulty, payload)
-
+def run_agent(task_id):
     try:
-        observation = env.reset(selected_task_id)
-    except (IndexError, TypeError, KeyError):
-        raise HTTPException(status_code=400, detail="Invalid task selection")
+        task_id = int(task_id)
+    except (TypeError, ValueError):
+        return "Invalid task ID. Use 0, 1, or 2."
 
-    return {
-        "observation": model_to_dict(observation),
-        "task": task_metadata(selected_task_id),
-    }
+    if task_id not in [0, 1, 2]:
+        return "Invalid task ID. Use 0, 1, or 2."
 
+    obs = env.reset(task_id)
+    result = llm_decide(obs.email)
 
-@app.post("/step", response_model=StepResponse)
-def step(action: Action) -> StepResponse:
-    if env.task is None:
-        raise HTTPException(status_code=400, detail="Call /reset before /step")
+    action = Action(
+        action_type=result.get("action", "ignore"),
+        response=result.get("response", ""),
+        reason=result.get("reason", ""),
+        confidence=result.get("confidence", 0.0),
+    )
 
-    observation, reward, done, info = env.step(action)
-    return StepResponse(
-        observation=model_to_dict(observation),
-        reward=reward,
-        done=done,
-        info=model_to_dict(info),
+    _, reward, _, _ = env.step(action)
+
+    return "\n".join(
+        [
+            f"Subject: {obs.email.subject}",
+            f"Body: {obs.email.body}",
+            "",
+            f"Action: {action.action_type}",
+            f"Response: {action.response}",
+            "",
+            f"Reason: {action.reason}",
+            f"Confidence: {round(action.confidence, 2)}",
+            f"Score: {round(reward, 2)}",
+        ]
     )
 
 
-@app.get("/state")
-def state() -> Dict[str, Any]:
-    if env.task is None:
-        return {"initialized": False, "state": None, "task": None}
+def render_page(output=""):
+    escaped_output = escape(output)
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Email Triage OpenEnv</title>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            margin: 0;
+            padding: 32px 16px;
+            color: #1f2937;
+        }}
+        .card {{
+            max-width: 760px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+        }}
+        h1 {{
+            margin-top: 0;
+            font-size: 32px;
+        }}
+        p {{
+            line-height: 1.5;
+        }}
+        label {{
+            display: block;
+            font-weight: 600;
+            margin: 20px 0 8px;
+        }}
+        input {{
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            box-sizing: border-box;
+        }}
+        button {{
+            margin-top: 16px;
+            background: #2563eb;
+            color: white;
+            border: 0;
+            border-radius: 10px;
+            padding: 14px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }}
+        pre {{
+            margin-top: 24px;
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 18px;
+            border-radius: 12px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }}
+        .hint {{
+            color: #475569;
+            font-size: 14px;
+        }}
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>AI Email Triage System</h1>
+        <p>Rule-based email triage environment with explanation and confidence.</p>
+        <form method="post">
+            <label for="task_id">Enter Task ID</label>
+            <input id="task_id" name="task_id" type="number" min="0" max="2" placeholder="0, 1, or 2" required>
+            <div class="hint">Use task 0 for spam, 1 for meeting request, and 2 for urgent incident.</div>
+            <button type="submit">Submit</button>
+        </form>
+        <pre>{escaped_output or "Output will appear here."}</pre>
+    </div>
+</body>
+</html>"""
 
-    current_state = model_to_dict(env.state())
-    current_task_id = current_state.get("id") if isinstance(current_state, dict) else None
-    metadata = task_metadata(current_task_id) if current_task_id in DIFFICULTY_TO_TASK_ID.values() else None
-    return {"initialized": True, "state": current_state, "task": metadata}
+
+class AppHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        page = render_page()
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.end_headers()
+        self.wfile.write(page.encode("utf-8"))
+
+    def do_POST(self):
+        content_length = int(self.headers.get("Content-Length", "0"))
+        raw_body = self.rfile.read(content_length).decode("utf-8")
+        form_data = parse_qs(raw_body)
+        task_id = form_data.get("task_id", [""])[0]
+        output = run_agent(task_id)
+        page = render_page(output)
+
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.end_headers()
+        self.wfile.write(page.encode("utf-8"))
+
+    def log_message(self, format, *args):
+        return
 
 
-def main() -> None:
-    uvicorn.run(app, host="0.0.0.0", port=7860)
+def main():
+    server = HTTPServer(("0.0.0.0", 7860), AppHandler)
+    print("Server running at http://127.0.0.1:7860")
+    server.serve_forever()
+
+
+if __name__ == "__main__":
+    main()

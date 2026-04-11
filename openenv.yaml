@@ -1,5 +1,5 @@
-name: email-triage-advanced
-description: Advanced real-world email triage environment
+name: email-triage-openenv
+description: Real-world email triage environment with three tasks and graded rewards.
 tasks:
   - id: 0
     difficulty: easy
