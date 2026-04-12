@@ -12,12 +12,6 @@ HF_TOKEN = os.getenv("HF_TOKEN", "")
 LOCAL_IMAGE_NAME = os.getenv("LOCAL_IMAGE_NAME", "")
 
 
-def grader(prediction, ground_truth):
-    if prediction.lower() == ground_truth.lower():
-        return 0.9
-    return 0.4
-
-
 def run():
     print("[START]")
 
@@ -35,8 +29,7 @@ def run():
             confidence=result.get("confidence", 0.0),
         )
 
-        expected = env.current_task["expected"]
-        score = grader(action.action_type, expected)
+        _, score, _, _ = env.step(action)
         total += score
 
         print(f"[STEP] task={task_id} score={score}")
