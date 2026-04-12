@@ -1,5 +1,6 @@
 name: email-triage-openenv
 description: Real-world email triage environment with three tasks and graded rewards.
+
 tasks:
   - id: email_triage_task_0
     task_id: spam_filter
@@ -8,19 +9,19 @@ tasks:
     description: Classify a promotional spam email and ignore it.
     input: "Subject: Win FREE iPhone!!! Body: Click this link to claim your prize now."
     expected_output: ignore
-    score: 0.81
     max_steps: 1
     reset_params:
       task_id: 0
     action_schema:
       action_type: ignore
       task_id: spam_filter
-    grader: env.graders:grade_task_0
+    grader: graders:grade_task_0
     graders:
-      - env.graders:grade_task_0
+      - graders:grade_task_0
     reward_range:
       - 0.01
       - 0.99
+
   - id: email_triage_task_1
     task_id: meeting_reply
     name: meeting-reply
@@ -28,19 +29,19 @@ tasks:
     description: Classify a meeting request and reply appropriately.
     input: "Subject: Meeting Request Body: Can we schedule a meeting tomorrow at 10 AM?"
     expected_output: reply
-    score: 0.82
     max_steps: 1
     reset_params:
       task_id: 1
     action_schema:
       action_type: reply
       task_id: meeting_reply
-    grader: env.graders:grade_task_1
+    grader: graders:grade_task_1
     graders:
-      - env.graders:grade_task_1
+      - graders:grade_task_1
     reward_range:
       - 0.01
       - 0.99
+
   - id: email_triage_task_2
     task_id: urgent_incident
     name: urgent-incident
@@ -48,16 +49,15 @@ tasks:
     description: Classify an urgent production incident and mark it urgent.
     input: "Subject: URGENT: Server Down Body: Production server is down. Immediate action needed!"
     expected_output: mark_urgent
-    score: 0.83
     max_steps: 1
     reset_params:
       task_id: 2
     action_schema:
       action_type: mark_urgent
       task_id: urgent_incident
-    grader: env.graders:grade_task_2
+    grader: graders:grade_task_2
     graders:
-      - env.graders:grade_task_2
+      - graders:grade_task_2
     reward_range:
       - 0.01
       - 0.99
