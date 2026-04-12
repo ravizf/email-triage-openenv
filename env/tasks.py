@@ -1,4 +1,4 @@
-from graders import grade, grade_task_0, grade_task_1, grade_task_2
+from .graders import grade, grade_task_0, grade_task_1, grade_task_2
 
 
 TASKS = [
