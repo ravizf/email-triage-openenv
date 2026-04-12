@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    {
+      "input": "Classify this email: We are offering you a job at our company",
+      "expected_output": "Work",
+      "grader": "exact_match",
+      "score": 0.8
+    },
+    {
+      "input": "Classify this email: Congratulations! You won 1 crore lottery",
+      "expected_output": "Spam",
+      "grader": "exact_match",
+      "score": 0.7
+    },
+    {
+      "input": "Classify this email: Meeting scheduled at 4 PM today",
+      "expected_output": "Work",
+      "grader": "exact_match",
+      "score": 0.6
+    }
+  ]
+}
