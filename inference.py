@@ -30,12 +30,14 @@ def run():
         )
 
         _, score, _, _ = env.step(action)
-        total += score
+        safe_score = max(0.01, min(0.99, score))
+        total += safe_score
 
-        print(f"[STEP] task={task_id} score={score}")
+        print(f"[STEP] task={task_id} score={safe_score:.2f}")
 
     avg = total / 3.0
-    print(f"[END] avg_score={avg}")
+    avg = max(0.01, min(0.99, avg))
+    print(f"[END] avg_score={avg:.2f}")
 
 
 if __name__ == "__main__":
