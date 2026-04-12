@@ -20,9 +20,10 @@ TASKS = [
         "reward_range": [0.01, 0.99],
         "score_range": [0.01, 0.99],
         "reset_params": {"task_id": 0},
-        "grader": grade_task_0,
-        "grader_fn": grade_task_0,
-        "grader_name": "grade_task_0",
+        "grader": "env.graders:grade_task_0",
+        "grader_fn": "env.graders:grade_task_0",
+        "grader_name": "env.graders:grade_task_0",
+        "graders": ["env.graders:grade_task_0"],
     },
     {
         "id": "email_triage_task_1",
@@ -42,9 +43,10 @@ TASKS = [
         "reward_range": [0.01, 0.99],
         "score_range": [0.01, 0.99],
         "reset_params": {"task_id": 1},
-        "grader": grade_task_1,
-        "grader_fn": grade_task_1,
-        "grader_name": "grade_task_1",
+        "grader": "env.graders:grade_task_1",
+        "grader_fn": "env.graders:grade_task_1",
+        "grader_name": "env.graders:grade_task_1",
+        "graders": ["env.graders:grade_task_1"],
     },
     {
         "id": "email_triage_task_2",
@@ -64,9 +66,10 @@ TASKS = [
         "reward_range": [0.01, 0.99],
         "score_range": [0.01, 0.99],
         "reset_params": {"task_id": 2},
-        "grader": grade_task_2,
-        "grader_fn": grade_task_2,
-        "grader_name": "grade_task_2",
+        "grader": "env.graders:grade_task_2",
+        "grader_fn": "env.graders:grade_task_2",
+        "grader_name": "env.graders:grade_task_2",
+        "graders": ["env.graders:grade_task_2"],
     }
 ]
 
