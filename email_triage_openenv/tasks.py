@@ -7,6 +7,8 @@ TASKS = [
         "task_id": "spam_filter",
         "name": "spam-filter",
         "difficulty": "easy",
+        "description": "Classify a promotional spam email and ignore it.",
+        "input": "Subject: Win FREE iPhone!!! Body: Click this link to claim your prize now.",
         "email": Email(
             subject="Win FREE iPhone!!!",
             body="Click this link to claim your prize now."
@@ -14,6 +16,7 @@ TASKS = [
         "expected": "ignore",
         "ground_truth": "ignore",
         "expected_output": "ignore",
+        "score": 0.81,
         "reward_range": [0.01, 0.99],
         "score_range": [0.01, 0.99],
         "reset_params": {"task_id": 0},
@@ -26,6 +29,8 @@ TASKS = [
         "task_id": "meeting_reply",
         "name": "meeting-reply",
         "difficulty": "medium",
+        "description": "Classify a meeting request and reply appropriately.",
+        "input": "Subject: Meeting Request Body: Can we schedule a meeting tomorrow at 10 AM?",
         "email": Email(
             subject="Meeting Request",
             body="Can we schedule a meeting tomorrow at 10 AM?"
@@ -33,6 +38,7 @@ TASKS = [
         "expected": "reply",
         "ground_truth": "reply",
         "expected_output": "reply",
+        "score": 0.82,
         "reward_range": [0.01, 0.99],
         "score_range": [0.01, 0.99],
         "reset_params": {"task_id": 1},
@@ -45,6 +51,8 @@ TASKS = [
         "task_id": "urgent_incident",
         "name": "urgent-incident",
         "difficulty": "hard",
+        "description": "Classify an urgent production incident and mark it urgent.",
+        "input": "Subject: URGENT: Server Down Body: Production server is down. Immediate action needed!",
         "email": Email(
             subject="URGENT: Server Down",
             body="Production server is down. Immediate action needed!"
@@ -52,6 +60,7 @@ TASKS = [
         "expected": "mark_urgent",
         "ground_truth": "mark_urgent",
         "expected_output": "mark_urgent",
+        "score": 0.83,
         "reward_range": [0.01, 0.99],
         "score_range": [0.01, 0.99],
         "reset_params": {"task_id": 2},
