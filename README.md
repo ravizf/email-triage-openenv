@@ -1,3 +1,12 @@
+---
+title: Email Triage OpenEnv
+emoji: "📧"
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+pinned: false
+---
+
 # Email Triage OpenEnv
 
 This project implements a real-world email triage environment where an agent classifies emails into one of three actions:
