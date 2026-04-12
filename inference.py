@@ -4,7 +4,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from graders import grade_task_0, grade_task_1, grade_task_2
+from env.graders import grade_task_0, grade_task_1, grade_task_2
 
 
 API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:7860")

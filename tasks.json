@@ -1,22 +1,22 @@
 {
   "tasks": [
     {
-      "input": "Classify this email: We are offering you a job at our company",
-      "expected_output": "Work",
-      "grader": "exact_match",
-      "score": 0.8
+      "id": "email_triage_task_0",
+      "input": "Classify this email: Win FREE iPhone!!! Click this link to claim your prize now.",
+      "expected_output": "ignore",
+      "grader": "env.graders:grade_task_0"
     },
     {
-      "input": "Classify this email: Congratulations! You won 1 crore lottery",
-      "expected_output": "Spam",
-      "grader": "exact_match",
-      "score": 0.7
+      "id": "email_triage_task_1",
+      "input": "Classify this email: Meeting Request. Can we schedule a meeting tomorrow at 10 AM?",
+      "expected_output": "reply",
+      "grader": "env.graders:grade_task_1"
     },
     {
-      "input": "Classify this email: Meeting scheduled at 4 PM today",
-      "expected_output": "Work",
-      "grader": "exact_match",
-      "score": 0.6
+      "id": "email_triage_task_2",
+      "input": "Classify this email: URGENT: Server Down. Production server is down. Immediate action needed!",
+      "expected_output": "mark_urgent",
+      "grader": "env.graders:grade_task_2"
     }
   ]
 }

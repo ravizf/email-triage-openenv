@@ -15,9 +15,9 @@ tasks:
     action_schema:
       action_type: ignore
       task_id: spam_filter
-    grader: graders:grade_task_0
+    grader: env.graders:grade_task_0
     graders:
-      - graders:grade_task_0
+      - env.graders:grade_task_0
     reward_range:
       - 0.01
       - 0.99
@@ -35,9 +35,9 @@ tasks:
     action_schema:
       action_type: reply
       task_id: meeting_reply
-    grader: graders:grade_task_1
+    grader: env.graders:grade_task_1
     graders:
-      - graders:grade_task_1
+      - env.graders:grade_task_1
     reward_range:
       - 0.01
       - 0.99
@@ -55,9 +55,9 @@ tasks:
     action_schema:
       action_type: mark_urgent
       task_id: urgent_incident
-    grader: graders:grade_task_2
+    grader: env.graders:grade_task_2
     graders:
-      - graders:grade_task_2
+      - env.graders:grade_task_2
     reward_range:
       - 0.01
       - 0.99
