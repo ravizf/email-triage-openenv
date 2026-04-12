@@ -1,9 +1,54 @@
 name: email-triage-openenv
 description: Real-world email triage environment with three tasks and graded rewards.
 tasks:
-  - id: 0
+  - id: email_triage_task_0
+    task_id: spam_filter
+    name: spam-filter
     difficulty: easy
-  - id: 1
+    description: Classify a promotional spam email and ignore it.
+    max_steps: 1
+    reset_params:
+      task_id: 0
+    action_schema:
+      action_type: ignore
+      task_id: spam_filter
+    grader: graders:grade_task_0
+    graders:
+      - graders:grade_task_0
+    reward_range:
+      - 0.01
+      - 0.99
+  - id: email_triage_task_1
+    task_id: meeting_reply
+    name: meeting-reply
     difficulty: medium
-  - id: 2
+    description: Classify a meeting request and reply appropriately.
+    max_steps: 1
+    reset_params:
+      task_id: 1
+    action_schema:
+      action_type: reply
+      task_id: meeting_reply
+    grader: graders:grade_task_1
+    graders:
+      - graders:grade_task_1
+    reward_range:
+      - 0.01
+      - 0.99
+  - id: email_triage_task_2
+    task_id: urgent_incident
+    name: urgent-incident
     difficulty: hard
+    description: Classify an urgent production incident and mark it urgent.
+    max_steps: 1
+    reset_params:
+      task_id: 2
+    action_schema:
+      action_type: mark_urgent
+      task_id: urgent_incident
+    grader: graders:grade_task_2
+    graders:
+      - graders:grade_task_2
+    reward_range:
+      - 0.01
+      - 0.99
