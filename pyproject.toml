@@ -19,4 +19,4 @@ email-triage-openenv = "app:main"
 server = "server.app:main"
 
 [tool.setuptools]
-packages = ["email_triage_openenv", "server"]
+packages = ["email_triage_openenv", "env", "server"]
